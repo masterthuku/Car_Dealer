@@ -1,28 +1,28 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/header";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata = {
   title: "VehiQl",
-  description: "VehiQl, you can drive it",
+  description: "If you dream it, you can drive it",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.className}`}
       >
-        {children}
+        <Header/>
+        <main className="min-h-screen">{children}</main>
+        <footer className="bg-blue-50 py-12">
+          <div className="container mx-auto text-center px-4 text-gray-600">
+            <p>© 2025 VehiQl. All rights reserved.</p>
+          </div>
+        </footer>
       </body>
     </html>
   );
