@@ -1,5 +1,6 @@
 import React from 'react'
-import CarsList from '../_components/CarsList'
+import CarsList from './_components/cars-list'
+
 
 export const metadata = {
     title: 'Cars',
