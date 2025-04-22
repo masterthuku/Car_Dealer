@@ -87,7 +87,7 @@ const CarsList = () => {
       toast.success("Car updated successfully");
       fetchCars(search);
     }
-  }, [updateResult, search, deleteResult]);
+  }, [updateResult, deleteResult]);
 
   useEffect(() => {
     if (CarsError) {
@@ -260,13 +260,32 @@ const CarsList = () => {
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuLabel>Status</DropdownMenuLabel>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  handleStatusUpdate(car, "AVAILABLE");
+                                }}
+                                disabled={
+                                  car.status === "AVAILABLE" || updatingCar
+                                }
+                              >
                                 Mark as Available
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusUpdate(car, "UNAVAILABLE")
+                                }
+                                disabled={
+                                  car.status === "UNAVAILABLE" || updatingCar
+                                }
+                              >
                                 Mark as Unavailable
                               </DropdownMenuItem>
-                              <DropdownMenuItem>Mark as Sold</DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleStatusUpdate(car, "SOLD")}
+                                disabled={car.status === "SOLD" || updatingCar}
+                              >
+                                Mark as Sold
+                              </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 className="text-red-600"
@@ -287,7 +306,20 @@ const CarsList = () => {
               </Table>
             </div>
           ) : (
-            <div></div>
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <CarIcon className="h-12 w-12 text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-1">
+                No cars found
+              </h3>
+              <p className="text-gray-500 mb-4">
+                {search
+                  ? "No cars match your search criteria"
+                  : "Your inventory is empty. Add cars to get started."}
+              </p>
+              <Button onClick={() => router.push("/admin/cars/create")}>
+                Add Your First Car
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>
