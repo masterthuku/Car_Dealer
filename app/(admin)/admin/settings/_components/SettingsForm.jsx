@@ -340,7 +340,6 @@ const SettingsForm = () => {
               ) : usersData?.success && filteredUsers?.length > 0 ? (
                 <div>
                   <Table>
-                    <TableCaption>A list of your recent invoices.</TableCaption>
                     <TableHeader>
                       <TableRow>
                         <TableHead>User</TableHead>

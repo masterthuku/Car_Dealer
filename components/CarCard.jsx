@@ -14,6 +14,7 @@ import { Button } from "./ui/button";
 import { useState } from "react";
 import { Badge } from "./ui/badge";
 import { useRouter } from "next/navigation";
+import { formatCurrency } from "@/lib/helper";
 
 const CarCard = ({ car }) => {
   const [isSaved, setIsSaved] = useState(car.wishlisted);
@@ -56,7 +57,7 @@ const CarCard = ({ car }) => {
             {car.make} {car.model}
           </h3>
           <span className="text-xl font-bold text-blue-600">
-            ${car.price.toLocaleString()}
+            {formatCurrency(car.price)}
           </span>
         </div>
 
@@ -64,7 +65,7 @@ const CarCard = ({ car }) => {
           <span>{car.year}</span>
           <span className="mx-2">•</span>
           <span>{car.transmission}</span>
-          <span className="mx-2">•</span>
+          <span className="mx-2">•</span> 
           <span>{car.fuelType}</span>
         </div>
 
