@@ -43,7 +43,7 @@ export async function processCarImageWithAI(file) {
     7. Fuel type (your best guess)
     8. Transmission type (your best guess)
     9. Price (your best guess in Kenyan Shillings)
-    9. Short Description as to be added to a car listing
+    9. Short Description as to be added to a car listing that includes the car horse power, engine capacity, number of doors, number cylinders in the engine.
 
     Format your response as a clean JSON object with these fields:
     {
