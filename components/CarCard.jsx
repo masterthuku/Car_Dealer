@@ -8,18 +8,53 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CarIcon, Heart } from "lucide-react";
+import { CarIcon, Heart, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/helper";
+import { toggleSavedCar } from "@/actions/carListing";
+import useFetch from "@/hooks/use-fetch";
+import { useAuth } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 const CarCard = ({ car }) => {
   const [isSaved, setIsSaved] = useState(car.wishlisted);
-  const handleToggleSave = async (e) => {};
+  const {isSignedIn} = useAuth();
   const router = useRouter();
+
+  const {
+    loading: isToggling,
+    fn: toggleSaveCarFn,
+    data: toggleResult,
+    error: toggleError,
+  } = useFetch(toggleSavedCar);
+
+  useEffect(() => {
+    if (toggleResult?.success && toggleResult.saved !== isSaved) {
+      setIsSaved(toggleResult.saved);
+      toast.success(toggleResult.message);
+    }
+  }, [toggleResult, isSaved]);
+
+  useEffect(() => {
+    if (toggleError) {
+      toast.error("Failed to update favourites")
+    }
+  }, [toggleError])
+
+  const handleToggleSave = async (e) => {
+    e.preventDefault();
+    if (!isSignedIn) {
+      toast.error("Please sign in to save a car");
+      router.push("/sign-in");
+      return;
+    }
+    if(isToggling) return;
+    await toggleSaveCarFn(car.id);
+  };
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition group py-0">
@@ -48,7 +83,11 @@ const CarCard = ({ car }) => {
           }`}
           onClick={handleToggleSave}
         >
-          <Heart className={isSaved ? "fill-current" : ""} size={20} />
+          {isToggling ? (
+            <Loader2 className="animate-spin h-4 w-4" />
+          ): (
+            <Heart className={isSaved ? "fill-current" : ""} size={20} />
+          )}
         </Button>
       </div>
       <CardContent className="p-4">
@@ -65,7 +104,7 @@ const CarCard = ({ car }) => {
           <span>{car.year}</span>
           <span className="mx-2">•</span>
           <span>{car.transmission}</span>
-          <span className="mx-2">•</span> 
+          <span className="mx-2">•</span>
           <span>{car.fuelType}</span>
         </div>
 
@@ -74,7 +113,7 @@ const CarCard = ({ car }) => {
             {car.bodyType}
           </Badge>
           <Badge variant="outline" className="bg-gray-50">
-            {car.mileage.toLocaleString()} Miles
+            {car.mileage.toLocaleString()} Km
           </Badge>
           <Badge variant="outline" className="bg-gray-50">
             {car.color}
