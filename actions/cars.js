@@ -255,12 +255,7 @@ export async function deleteCar(id) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
-    });
-
-    if (!user) throw new Error("User not found");
-
+    // First, fetch the car to get its images
     const car = await db.car.findUnique({
       where: { id },
       select: { images: true },
@@ -272,13 +267,23 @@ export async function deleteCar(id) {
         error: "Car not found",
       };
     }
+
+    // Delete all TestDriveBooking records associated with the car
+    await db.testDriveBooking.deleteMany({
+      where: { carId: id },
+    });
+
+    // Delete the car from the database
     await db.car.delete({
       where: { id },
     });
 
+    // Delete the images from Supabase storage
     try {
-      const cookieStore = await cookies();
+      const cookieStore = cookies();
       const supabase = createClient(cookieStore);
+
+      // Extract file paths from image URLs
       const filePaths = car.images
         .map((imageUrl) => {
           const url = new URL(imageUrl);
@@ -287,6 +292,7 @@ export async function deleteCar(id) {
         })
         .filter(Boolean);
 
+      // Delete files from storage if paths were extracted
       if (filePaths.length > 0) {
         const { error } = await supabase.storage
           .from("car-images")
@@ -299,7 +305,10 @@ export async function deleteCar(id) {
     } catch (storageError) {
       console.error("Error with storage operations:", storageError);
     }
+
+    // Revalidate the cars list page
     revalidatePath("/admin/cars");
+
     return {
       success: true,
     };
@@ -311,7 +320,6 @@ export async function deleteCar(id) {
     };
   }
 }
-
 export async function updateCarStatus(id, { status, featured }) {
   try {
     const { userId } = await auth();
